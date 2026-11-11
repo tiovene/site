@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tio Vené Games</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #351000, #a83c00);
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    min-height: 100vh;
+}
+
+header {
+    padding: 30px;
+}
+
+h1 {
+    color: #ffcc33;
+    font-size: 42px;
+    text-shadow: 3px 3px #6b2200;
+}
+
+header p {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+main {
+    padding: 20px;
+}
+
+#game {
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+    height: 400px;
+    margin: 20px auto;
+    background: linear-gradient(#ffda85, #ff9c42);
+    border: 5px solid #ffcc33;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+#player {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 45px;
+}
+
+.lasanha {
+    position: absolute;
+    font-size: 32px;
+}
+
+#score {
+    color: #ffcc33;
+    font-size: 25px;
+    margin: 15px;
+}
+
+button {
+    background: #ffcc33;
+    border: none;
+    padding: 14px 25px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 10px;
+}
+
+button:hover {
+    background: #ff9900;
+}
+
+.controls button {
+    width: 75px;
+    font-size: 25px;
+}
+
+footer {
+    padding: 20px;
+    color: #ffcc33;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🍝 TIO VENÉ GAMES 🍝</h1>
+    <p>O melhor site de jogos do mundo!</p>
+    <p>Feito especialmente para quem ama LASANHA!</p>
+</header>
+
+<main>
+    <h2>🍝 Pegue as Lasanhas!</h2>
+    <p>Movimente o Tio Vené e pegue as lasanhas que caem!</p>
+
+    <div id="score">Pontuação: 0</div>
+
+    <div id="game">
+        <div id="player">🧔</div>
+    </div>
+
+    <button onclick="startGame()">COMEÇAR JOGO</button>
+
+    <div class="controls">
+        <button onclick="move(-25)">⬅️</button>
+        <button onclick="move(25)">➡️</button>
+    </div>
+
+    <p>Use as setas do teclado ou os botões para jogar.</p>
+</main>
+
+<footer>
+    <p>© 2026 - Tio Vené. Todos os direitos reservados.</p>
+    <p>🍝 LASANHA É VIDA! 🍝</p>
+</footer>
+
+<script>
+const game = document.getElementById("game");
+const player = document.getElementById("player");
+const scoreText = document.getElementById("score");
+
+let score = 0;
+let playerX = 50;
+let running = false;
+let interval;
+
+function move(direction) {
+    if (!running) return;
+
+    playerX += direction / 5;
+
+    playerX = Math.max(5, Math.min(95, playerX));
+
+    player.style.left = playerX + "%";
+}
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "ArrowLeft") move(-25);
+    if (e.key === "ArrowRight") move(25);
+});
+
+function startGame() {
+    clearInterval(interval);
+
+    document.querySelectorAll(".lasanha").forEach(el => el.remove());
+
+    score = 0;
+    playerX = 50;
+    running = true;
+
+    player.style.left = "50%";
+    scoreText.innerText = "Pontuação: 0";
+
+    interval = setInterval(createLasanha, 900);
+}
+
+function createLasanha() {
+    if (!running) return;
+
+    const food = document.createElement("div");
+
+    food.className = "lasanha";
+    food.innerText = "🍝";
+
+    let x = Math.random() * 90;
+
+    food.style.left = x + "%";
+    food.style.top = "0px";
+
+    game.appendChild(food);
+
+    let y = 0;
+
+    const fall = setInterval(() => {
+        if (!running) {
+            clearInterval(fall);
+            food.remove();
+            return;
+        }
+
+        y += 4;
+        food.style.top = y + "px";
+
+        let foodRect = food.getBoundingClientRect();
+        let playerRect = player.getBoundingClientRect();
+
+        if (
+            foodRect.bottom >= playerRect.top &&
+            foodRect.left < playerRect.right &&
+            foodRect.right > playerRect.left
+        ) {
+            score++;
+            scoreText.innerText = "Pontuação: " + score;
+            food.remove();
+            clearInterval(fall);
+        }
+
+        if (y > 400) {
+            food.remove();
+            clearInterval(fall);
+        }
+
+    }, 30);
+}
+</script>
+
+</body>
+</html>
